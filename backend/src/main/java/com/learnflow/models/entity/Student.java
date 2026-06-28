@@ -19,19 +19,19 @@ public class Student {
     @Column(nullable = false, length = 150)
     private String fullName;
 
-    @Column(name = "date_of_birth")
+    @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-    @Column(length = 20)
+    @Column(nullable = false, length = 20)
     private String nit;
 
-    @Column(name = "card_number", length = 20)
+    @Column(name = "card_number", nullable = false, length = 20)
     private String cardNumber;
 
-    @Column(name = "card_expiry")
+    @Column(name = "card_expiry", nullable = false)
     private LocalDate cardExpiry;
 
-    @Column(name = "photo_url", length = 500)
+    @Column(name = "photo_url", nullable = false, length = 500)
     private String photoUrl;
 
     @Column(updatable = false)
