@@ -7,7 +7,6 @@ Universidad San Carlos de Guatemala
 Facultad de Ingeniería
 Ingeniería en Ciencias y Sistemas
 Análisis y Diseño de Sistemas 2
-
 ---
 
 ## Índice
