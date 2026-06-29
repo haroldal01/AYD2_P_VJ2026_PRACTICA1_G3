@@ -1,0 +1,588 @@
+{
+  "info": {
+    "name": "LearnFlow API",
+    "description": "Colección de pruebas para la API de LearnFlow — AYD2 VJ2026 G3\n\nORDEN DE PRUEBA:\n1. Auth (obtener tokens)\n2. Admin Dashboard (requiere token admin)\n3. Catálogos — Tipos, Categorías, Niveles (requiere token admin)\n4. Cursos (requiere token admin)\n5. Estudiante — Perfil (requiere token estudiante)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api", "type": "string" },
+    { "key": "adminToken", "value": "", "type": "string" },
+    { "key": "studentToken", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "description": "Ejecutar en este orden:\n1. Health Check (sin token)\n2. Login Admin → guarda token en variable adminToken\n3. Registrar Estudiante\n4. Login Estudiante → guarda token en variable studentToken",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/auth/health", "host": ["{{baseUrl}}"], "path": ["auth", "health"] },
+            "description": "Verifica que el servidor está corriendo. No requiere token."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('adminToken', json.token);",
+                  "    console.log('adminToken guardado:', json.token.substring(0, 30) + '...');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@learnflow.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/admin/login", "host": ["{{baseUrl}}"], "path": ["auth", "admin", "login"] },
+            "description": "Login para el administrador de contenido. El token se guarda automáticamente en la variable adminToken."
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar Estudiante",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Juan Carlos Pérez\",\n  \"dateOfBirth\": \"2000-05-15\",\n  \"email\": \"juan.perez@estudiante.com\",\n  \"password\": \"password123\",\n  \"nit\": \"1234567-8\",\n  \"cardNumber\": \"4111111111111111\",\n  \"cardExpiry\": \"2027-12-31\",\n  \"photoUrl\": \"https://example.com/foto.jpg\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] },
+            "description": "Registra un nuevo estudiante. Cambia el email si ya existe."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('studentToken', json.token);",
+                  "    console.log('studentToken guardado:', json.token.substring(0, 30) + '...');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@estudiante.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "description": "Login para estudiantes. El token se guarda automáticamente en la variable studentToken."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Admin Dashboard",
+      "description": "Requiere haber ejecutado 'Login Admin' primero para tener adminToken.\n\nEndpoints principales del dashboard del administrador:\n- GET /courses → búsqueda con filtros\n- GET /stats  → datos para las 4 gráficas",
+      "item": [
+        {
+          "name": "Stats (todas las gráficas)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "stats"]
+            },
+            "description": "Devuelve en un solo objeto:\n- topCategories: Top 3 categorías con más reproducciones\n- topDifficultyLevels: Top 3 niveles más cursados\n- topCourses: Top 10 cursos más visualizados\n- subscriptionDistribution: Distribución de estudiantes por tipo de suscripción"
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Cursos (sin filtros — todos)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "courses"]
+            },
+            "description": "Devuelve todos los cursos activos sin filtros."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por Título",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/courses?title=React",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "courses"],
+              "query": [{ "key": "title", "value": "React", "description": "Búsqueda parcial, ignora mayúsculas" }]
+            },
+            "description": "Busca cursos por título (parcial, case-insensitive)."
+          },
+          "response": []
+        },
+        {
+          "name": "Filtrar por Tipo de Contenido",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/courses?contentTypeId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "courses"],
+              "query": [{ "key": "contentTypeId", "value": "1", "description": "1=Clase grabada, 2=Taller en vivo, 3=Conferencia" }]
+            },
+            "description": "Filtra por tipo de contenido.\nIDs sembrados:\n- 1 = Clase grabada\n- 2 = Taller en vivo\n- 3 = Conferencia"
+          },
+          "response": []
+        },
+        {
+          "name": "Filtrar por Categoría",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/courses?categoryId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "courses"],
+              "query": [{ "key": "categoryId", "value": "1", "description": "1=Programacion, 2=Diseno, 3=Negocios" }]
+            },
+            "description": "Filtra por categoría temática.\nIDs sembrados:\n- 1 = Programación\n- 2 = Diseño\n- 3 = Negocios"
+          },
+          "response": []
+        },
+        {
+          "name": "Filtrar por Nivel de Dificultad",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/courses?difficultyLevelId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "courses"],
+              "query": [{ "key": "difficultyLevelId", "value": "1", "description": "1=Principiante, 2=Intermedio, 3=Avanzado" }]
+            },
+            "description": "Filtra por nivel de dificultad.\nIDs sembrados:\n- 1 = Principiante\n- 2 = Intermedio\n- 3 = Avanzado"
+          },
+          "response": []
+        },
+        {
+          "name": "Filtrar por Año",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/courses?year=2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "courses"],
+              "query": [{ "key": "year", "value": "2024" }]
+            },
+            "description": "Filtra por año de producción del curso."
+          },
+          "response": []
+        },
+        {
+          "name": "Filtros Combinados",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/courses?title=React&categoryId=1&difficultyLevelId=1&year=2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "courses"],
+              "query": [
+                { "key": "title", "value": "React" },
+                { "key": "categoryId", "value": "1" },
+                { "key": "difficultyLevelId", "value": "1" },
+                { "key": "year", "value": "2024" }
+              ]
+            },
+            "description": "Combina múltiples filtros en una sola búsqueda. Todos los parámetros son opcionales."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Catálogos (Admin)",
+      "description": "CRUD de tipos de contenido, categorías y niveles de dificultad.\nTodos requieren token de admin.",
+      "item": [
+        {
+          "name": "Categorías",
+          "item": [
+            {
+              "name": "Listar Categorías",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Crear Categoría",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Marketing Digital\",\n  \"description\": \"Cursos sobre estrategias de marketing en línea\",\n  \"active\": true\n}"
+                },
+                "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Actualizar Categoría",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Marketing Digital\",\n  \"description\": \"Cursos actualizados de marketing en línea\",\n  \"active\": true\n}"
+                },
+                "url": { "raw": "{{baseUrl}}/categories/4", "host": ["{{baseUrl}}"], "path": ["categories", "4"] },
+                "description": "Cambia el id (4) por el id devuelto en la creación."
+              },
+              "response": []
+            },
+            {
+              "name": "Eliminar Categoría",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": { "raw": "{{baseUrl}}/categories/4", "host": ["{{baseUrl}}"], "path": ["categories", "4"] },
+                "description": "Cambia el id (4) por el id a eliminar."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Tipos de Contenido",
+          "item": [
+            {
+              "name": "Listar Tipos",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": { "raw": "{{baseUrl}}/content-types", "host": ["{{baseUrl}}"], "path": ["content-types"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Crear Tipo",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Webinar\",\n  \"description\": \"Seminario web interactivo en vivo\",\n  \"active\": true\n}"
+                },
+                "url": { "raw": "{{baseUrl}}/content-types", "host": ["{{baseUrl}}"], "path": ["content-types"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Actualizar Tipo",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Webinar\",\n  \"description\": \"Seminario web actualizado\",\n  \"active\": true\n}"
+                },
+                "url": { "raw": "{{baseUrl}}/content-types/4", "host": ["{{baseUrl}}"], "path": ["content-types", "4"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Eliminar Tipo",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": { "raw": "{{baseUrl}}/content-types/4", "host": ["{{baseUrl}}"], "path": ["content-types", "4"] }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Niveles de Dificultad",
+          "item": [
+            {
+              "name": "Listar Niveles",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": { "raw": "{{baseUrl}}/difficulty-levels", "host": ["{{baseUrl}}"], "path": ["difficulty-levels"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Crear Nivel",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Experto\",\n  \"description\": \"Contenido para profesionales con amplia experiencia\",\n  \"active\": true\n}"
+                },
+                "url": { "raw": "{{baseUrl}}/difficulty-levels", "host": ["{{baseUrl}}"], "path": ["difficulty-levels"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Actualizar Nivel",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Experto\",\n  \"description\": \"Contenido actualizado para expertos\",\n  \"active\": true\n}"
+                },
+                "url": { "raw": "{{baseUrl}}/difficulty-levels/4", "host": ["{{baseUrl}}"], "path": ["difficulty-levels", "4"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Eliminar Nivel",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": { "raw": "{{baseUrl}}/difficulty-levels/4", "host": ["{{baseUrl}}"], "path": ["difficulty-levels", "4"] }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Cursos (Admin)",
+      "description": "CRUD de cursos. Todos requieren token de admin.\nNota: al crear un curso necesitas los IDs de tipo, categoría y nivel (obtenidos del paso 3).",
+      "item": [
+        {
+          "name": "Listar Cursos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/courses", "host": ["{{baseUrl}}"], "path": ["courses"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Curso por Título",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/courses?title=React",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses"],
+              "query": [{ "key": "title", "value": "React" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Curso",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Python para Data Science\",\n  \"productionYear\": 2025,\n  \"instructor\": \"Ana García\",\n  \"shortSummary\": \"Análisis de datos con Python y Pandas\",\n  \"description\": \"Curso completo de análisis de datos usando Python, Pandas, NumPy y Matplotlib para proyectos reales.\",\n  \"mediaUrl\": \"https://example.com/python-data-science\",\n  \"contentTypeId\": 1,\n  \"categoryId\": 1,\n  \"difficultyLevelId\": 2,\n  \"active\": true\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/courses", "host": ["{{baseUrl}}"], "path": ["courses"] },
+            "description": "Crea un curso. IDs de referencia:\ncontentTypeId: 1=Clase grabada, 2=Taller, 3=Conferencia\ncategoryId: 1=Programación, 2=Diseño, 3=Negocios\ndifficultyLevelId: 1=Principiante, 2=Intermedio, 3=Avanzado"
+          },
+          "response": []
+        },
+        {
+          "name": "Ver Curso por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/courses/1", "host": ["{{baseUrl}}"], "path": ["courses", "1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Curso",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Python para Data Science — Edición 2025\",\n  \"productionYear\": 2025,\n  \"instructor\": \"Ana García\",\n  \"shortSummary\": \"Análisis de datos actualizado con Python\",\n  \"description\": \"Versión actualizada del curso con los últimos cambios de Pandas 2.0.\",\n  \"mediaUrl\": \"https://example.com/python-data-science-v2\",\n  \"contentTypeId\": 1,\n  \"categoryId\": 1,\n  \"difficultyLevelId\": 2,\n  \"active\": true\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/courses/2", "host": ["{{baseUrl}}"], "path": ["courses", "2"] },
+            "description": "Cambia el id (2) por el id del curso a actualizar."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Curso",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/courses/2", "host": ["{{baseUrl}}"], "path": ["courses", "2"] },
+            "description": "Elimina permanentemente el curso. Cambia el id."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Estudiante (Student Token)",
+      "description": "Operaciones del perfil del estudiante. Requieren haber ejecutado 'Login Estudiante' primero.",
+      "item": [
+        {
+          "name": "Ver Mi Perfil",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/students/me", "host": ["{{baseUrl}}"], "path": ["students", "me"] },
+            "description": "Devuelve el perfil completo del estudiante autenticado."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Mi Perfil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Juan Carlos Pérez Actualizado\",\n  \"dateOfBirth\": \"2000-05-15\",\n  \"nit\": \"9876543-2\",\n  \"cardNumber\": \"5555555555554444\",\n  \"cardExpiry\": \"2028-06-30\",\n  \"photoUrl\": \"https://example.com/nueva-foto.jpg\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/students/me", "host": ["{{baseUrl}}"], "path": ["students", "me"] },
+            "description": "Actualiza los datos del estudiante. El campo 'password' es opcional — si no se envía, no cambia."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Contraseña",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Juan Carlos Pérez\",\n  \"dateOfBirth\": \"2000-05-15\",\n  \"nit\": \"1234567-8\",\n  \"cardNumber\": \"4111111111111111\",\n  \"cardExpiry\": \"2027-12-31\",\n  \"photoUrl\": \"https://example.com/foto.jpg\",\n  \"password\": \"nuevaPassword456\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/students/me", "host": ["{{baseUrl}}"], "path": ["students", "me"] },
+            "description": "Incluye el campo 'password' para actualizar la contraseña."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Pruebas de Seguridad",
+      "description": "Verificar que los endpoints estén protegidos correctamente.",
+      "item": [
+        {
+          "name": "Admin con token de Estudiante (debe dar 403)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/dashboard/stats", "host": ["{{baseUrl}}"], "path": ["admin", "dashboard", "stats"] },
+            "description": "Un estudiante NO puede acceder al dashboard admin. Esperado: 403 Forbidden."
+          },
+          "response": []
+        },
+        {
+          "name": "Estudiante sin token (debe dar 403)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/students/me", "host": ["{{baseUrl}}"], "path": ["students", "me"] },
+            "description": "Sin token no hay acceso. Esperado: 403 Forbidden."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Admin con credenciales incorrectas (debe dar 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@learnflow.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/admin/login", "host": ["{{baseUrl}}"], "path": ["auth", "admin", "login"] },
+            "description": "Esperado: 401 Unauthorized."
+          },
+          "response": []
+        },
+        {
+          "name": "Estudiante intentando login por endpoint admin (debe dar 403)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@estudiante.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/admin/login", "host": ["{{baseUrl}}"], "path": ["auth", "admin", "login"] },
+            "description": "Un estudiante no puede usar el endpoint de admin. Esperado: 403 Forbidden."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 package com.learnflow.models.dto;
 
 import com.learnflow.models.entity.Student;
+import com.learnflow.models.entity.User;
 
 public record AuthResponse(
         String token,
@@ -18,6 +19,17 @@ public record AuthResponse(
                 student.getUser().getEmail(),
                 student.getUser().getRole().getName(),
                 student.getFullName()
+        );
+    }
+
+    public static AuthResponse fromAdmin(String token, User user) {
+        return new AuthResponse(
+                token,
+                user.getId(),
+                null,
+                user.getEmail(),
+                user.getRole().getName(),
+                "Administrador"
         );
     }
 }

@@ -1,29 +1,38 @@
 package com.learnflow.config;
 
-import com.learnflow.models.entity.Role;
 import com.learnflow.models.entity.Category;
 import com.learnflow.models.entity.ContentType;
 import com.learnflow.models.entity.DifficultyLevel;
+import com.learnflow.models.entity.Role;
+import com.learnflow.models.entity.User;
 import com.learnflow.repositories.CategoryRepository;
 import com.learnflow.repositories.ContentTypeRepository;
 import com.learnflow.repositories.DifficultyLevelRepository;
 import com.learnflow.repositories.RoleRepository;
+import com.learnflow.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final ContentTypeRepository contentTypeRepository;
     private final CategoryRepository categoryRepository;
     private final DifficultyLevelRepository difficultyLevelRepository;
 
     public DataInitializer(RoleRepository roleRepository,
+                           UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
                            ContentTypeRepository contentTypeRepository,
                            CategoryRepository categoryRepository,
                            DifficultyLevelRepository difficultyLevelRepository) {
         this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.contentTypeRepository = contentTypeRepository;
         this.categoryRepository = categoryRepository;
         this.difficultyLevelRepository = difficultyLevelRepository;
@@ -31,37 +40,51 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (roleRepository.findByName("ESTUDIANTE").isEmpty()) {
-            roleRepository.save(new Role("ESTUDIANTE"));
-        }
-        if (roleRepository.findByName("ADMIN_CONTENIDO").isEmpty()) {
-            roleRepository.save(new Role("ADMIN_CONTENIDO"));
-        }
+        Role estudianteRole = seedRole("ESTUDIANTE");
+        Role adminRole = seedRole("ADMIN_CONTENIDO");
 
-        createContentType("Clase grabada", "Contenido asincronico disponible bajo demanda");
-        createContentType("Taller en vivo", "Sesion interactiva transmitida en tiempo real");
-        createContentType("Conferencia", "Presentacion educativa dirigida por un instructor");
+        seedAdminUser(adminRole);
 
-        createCategory("Programacion", "Cursos relacionados con desarrollo de software");
-        createCategory("Diseno", "Cursos relacionados con diseno visual y experiencia de usuario");
-        createCategory("Negocios", "Cursos relacionados con gestion, ventas y emprendimiento");
+        seedContentType("Clase grabada", "Contenido asincronico disponible bajo demanda");
+        seedContentType("Taller en vivo", "Sesion interactiva transmitida en tiempo real");
+        seedContentType("Conferencia", "Presentacion educativa dirigida por un instructor");
 
-        createDifficultyLevel("Principiante", "Contenido introductorio para estudiantes nuevos");
-        createDifficultyLevel("Intermedio", "Contenido para estudiantes con conocimientos base");
-        createDifficultyLevel("Avanzado", "Contenido especializado de mayor complejidad");
+        seedCategory("Programacion", "Cursos relacionados con desarrollo de software");
+        seedCategory("Diseno", "Cursos relacionados con diseno visual y experiencia de usuario");
+        seedCategory("Negocios", "Cursos relacionados con gestion, ventas y emprendimiento");
+
+        seedDifficultyLevel("Principiante", "Contenido introductorio para estudiantes nuevos");
+        seedDifficultyLevel("Intermedio", "Contenido para estudiantes con conocimientos base");
+        seedDifficultyLevel("Avanzado", "Contenido especializado de mayor complejidad");
     }
 
-    private void createContentType(String name, String description) {
+    private Role seedRole(String name) {
+        return roleRepository.findByName(name)
+                .orElseGet(() -> roleRepository.save(new Role(name)));
+    }
+
+    private void seedAdminUser(Role adminRole) {
+        if (userRepository.findByEmail("admin@learnflow.com").isEmpty()) {
+            User admin = new User();
+            admin.setEmail("admin@learnflow.com");
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setRole(adminRole);
+            admin.setEnabled(true);
+            userRepository.save(admin);
+        }
+    }
+
+    private void seedContentType(String name, String description) {
         if (contentTypeRepository.findByNameIgnoreCase(name).isEmpty()) {
-            ContentType contentType = new ContentType();
-            contentType.setName(name);
-            contentType.setDescription(description);
-            contentType.setActive(true);
-            contentTypeRepository.save(contentType);
+            ContentType ct = new ContentType();
+            ct.setName(name);
+            ct.setDescription(description);
+            ct.setActive(true);
+            contentTypeRepository.save(ct);
         }
     }
 
-    private void createCategory(String name, String description) {
+    private void seedCategory(String name, String description) {
         if (categoryRepository.findByNameIgnoreCase(name).isEmpty()) {
             Category category = new Category();
             category.setName(name);
@@ -71,13 +94,13 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    private void createDifficultyLevel(String name, String description) {
+    private void seedDifficultyLevel(String name, String description) {
         if (difficultyLevelRepository.findByNameIgnoreCase(name).isEmpty()) {
-            DifficultyLevel difficultyLevel = new DifficultyLevel();
-            difficultyLevel.setName(name);
-            difficultyLevel.setDescription(description);
-            difficultyLevel.setActive(true);
-            difficultyLevelRepository.save(difficultyLevel);
+            DifficultyLevel level = new DifficultyLevel();
+            level.setName(name);
+            level.setDescription(description);
+            level.setActive(true);
+            difficultyLevelRepository.save(level);
         }
     }
 }
