@@ -36,8 +36,8 @@ export default function App() {
         }
       >
         <Route path="/inicio" element={isAdmin ? <Navigate to="/admin/dashboard" replace /> : <Home />} />
-        <Route path="/perfil" element={<Profile />} />
-        <Route path="/suscripciones" element={<Subscriptions />} />
+        <Route path="/perfil" element={isAdmin ? <Navigate to="/admin/dashboard" replace /> : <Profile />} />
+        <Route path="/suscripciones" element={isAdmin ? <Navigate to="/admin/dashboard" replace /> : <Subscriptions />} />
         <Route
           path="/admin/dashboard"
           element={

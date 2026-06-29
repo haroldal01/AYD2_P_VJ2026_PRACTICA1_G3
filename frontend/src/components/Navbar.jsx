@@ -18,11 +18,18 @@ export default function Navbar() {
       </div>
 
       <div className="navbar__links">
-        <NavLink to="/inicio">Inicio</NavLink>
-        <NavLink to="/suscripciones">Suscripciones</NavLink>
-        <NavLink to="/perfil">Perfil</NavLink>
-        {isAdmin && <NavLink to="/admin/dashboard">Dashboard</NavLink>}
-        {isAdmin && <NavLink to="/admin/contenido">Contenido</NavLink>}
+        {isAdmin ? (
+          <>
+            <NavLink to="/admin/dashboard">Dashboard</NavLink>
+            <NavLink to="/admin/contenido">Contenido</NavLink>
+          </>
+        ) : (
+          <>
+            <NavLink to="/inicio">Inicio</NavLink>
+            <NavLink to="/suscripciones">Suscripciones</NavLink>
+            <NavLink to="/perfil">Perfil</NavLink>
+          </>
+        )}
       </div>
 
       <div className="navbar__user">
