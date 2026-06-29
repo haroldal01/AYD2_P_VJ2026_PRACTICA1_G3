@@ -43,7 +43,7 @@ export default function Register() {
   return (
     <div className="auth-page">
       <div className="auth-card auth-card--wide">
-        <h1 className="auth-card__brand">▶ LearnFlow</h1>
+        <h1 className="auth-card__brand">LearnFlow</h1>
         <h2>Crear cuenta de estudiante</h2>
 
         {error && <div className="alert alert--error">{error}</div>}
@@ -97,7 +97,7 @@ export default function Register() {
         </form>
 
         <p className="auth-card__footer">
-          ¿Ya tienes cuenta? <Link to="/login">Inicia sesion</Link>
+          Ya tienes cuenta? <Link to="/login">Inicia sesion</Link>
         </p>
       </div>
     </div>

@@ -14,13 +14,14 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar__brand">
-        <span className="navbar__logo">▶</span> LearnFlow
+        <span className="navbar__logo">LF</span> LearnFlow
       </div>
 
       <div className="navbar__links">
         <NavLink to="/inicio">Inicio</NavLink>
         <NavLink to="/suscripciones">Suscripciones</NavLink>
         <NavLink to="/perfil">Perfil</NavLink>
+        {isAdmin && <NavLink to="/admin/dashboard">Dashboard</NavLink>}
         {isAdmin && <NavLink to="/admin/contenido">Contenido</NavLink>}
       </div>
 

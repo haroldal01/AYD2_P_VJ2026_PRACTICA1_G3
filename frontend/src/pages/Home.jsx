@@ -61,7 +61,7 @@ export default function Home() {
         <h2 className="section-title">
           Recomendado para ti
           {favoriteCategory && (
-            <span className="muted"> · basado en {favoriteCategory}</span>
+            <span className="muted"> - basado en {favoriteCategory}</span>
           )}
         </h2>
         {recommendations.length === 0 ? (
@@ -70,7 +70,7 @@ export default function Home() {
           <div className="course-grid">
             {recommendations.map((course) => (
               <article key={course.courseId} className="course-card">
-                <div className="course-card__thumb">▶</div>
+                <div className="course-card__thumb">Play</div>
                 <h3>{course.title}</h3>
                 <p className="muted">{course.instructor}</p>
                 <span className="badge badge--blue">{course.category}</span>
@@ -98,7 +98,7 @@ export default function Home() {
                 <span className="ranking__pos">{index + 1}</span>
                 <div className="ranking__info">
                   <strong>{course.title}</strong>
-                  <span className="muted">{course.instructor} · {course.category}</span>
+                  <span className="muted">{course.instructor} - {course.category}</span>
                 </div>
                 <span className="ranking__views">{course.viewCount.toLocaleString()} vistas</span>
               </li>
@@ -117,7 +117,7 @@ export default function Home() {
               <article key={entry.id} className="history-item">
                 <div className="history-item__info">
                   <strong>{entry.courseTitle}</strong>
-                  <span className="muted">{entry.instructor} · {entry.category}</span>
+                  <span className="muted">{entry.instructor} - {entry.category}</span>
                 </div>
                 <span className="badge badge--gray">
                   {new Date(entry.watchedAt).toLocaleDateString()}

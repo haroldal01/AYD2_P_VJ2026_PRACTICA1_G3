@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Subscriptions from './pages/Subscriptions';
 import ContentAdmin from './pages/ContentAdmin';
+import AdminDashboard from './pages/AdminDashboard';
 
 // Define todas las rutas de la aplicacion.
 export default function App() {
@@ -36,6 +37,14 @@ export default function App() {
         <Route path="/inicio" element={<Home />} />
         <Route path="/perfil" element={<Profile />} />
         <Route path="/suscripciones" element={<Subscriptions />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin/contenido"
           element={

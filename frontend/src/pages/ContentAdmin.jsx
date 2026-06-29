@@ -107,7 +107,7 @@ function CatalogPanel({ catalogKey }) {
   };
 
   const remove = async (id) => {
-    if (!window.confirm('¿Eliminar este registro?')) return;
+    if (!window.confirm('Eliminar este registro?')) return;
     setError('');
     try {
       await api.delete(`${cfg.path}/${id}`);
@@ -271,7 +271,7 @@ function CoursesPanel() {
   };
 
   const remove = async (id) => {
-    if (!window.confirm('¿Eliminar este curso?')) return;
+    if (!window.confirm('Eliminar este curso?')) return;
     setError('');
     try {
       await api.delete(`/courses/${id}`);

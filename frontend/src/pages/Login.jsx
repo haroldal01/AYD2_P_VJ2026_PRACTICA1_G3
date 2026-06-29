@@ -30,7 +30,7 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1 className="auth-card__brand">▶ LearnFlow</h1>
+        <h1 className="auth-card__brand">LearnFlow</h1>
         <h2>Iniciar sesion</h2>
 
         {error && <div className="alert alert--error">{error}</div>}
@@ -55,7 +55,7 @@ export default function Login() {
               name="password"
               value={form.password}
               onChange={handleChange}
-              placeholder="••••••••"
+              placeholder="********"
               required
             />
           </label>
@@ -66,7 +66,7 @@ export default function Login() {
         </form>
 
         <p className="auth-card__footer">
-          ¿No tienes cuenta? <Link to="/registro">Registrate</Link>
+          No tienes cuenta? <Link to="/registro">Registrate</Link>
         </p>
       </div>
     </div>
