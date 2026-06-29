@@ -12,18 +12,19 @@ import AdminDashboard from './pages/AdminDashboard';
 
 // Define todas las rutas de la aplicacion.
 export default function App() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
+  const defaultPath = isAdmin ? '/admin/dashboard' : '/inicio';
 
   return (
     <Routes>
       {/* Publicas */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/inicio" replace /> : <Login />}
+        element={isAuthenticated ? <Navigate to={defaultPath} replace /> : <Login />}
       />
       <Route
         path="/registro"
-        element={isAuthenticated ? <Navigate to="/inicio" replace /> : <Register />}
+        element={isAuthenticated ? <Navigate to={defaultPath} replace /> : <Register />}
       />
 
       {/* Privadas: comparten el Layout con navbar */}
@@ -34,7 +35,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/inicio" element={<Home />} />
+        <Route path="/inicio" element={isAdmin ? <Navigate to="/admin/dashboard" replace /> : <Home />} />
         <Route path="/perfil" element={<Profile />} />
         <Route path="/suscripciones" element={<Subscriptions />} />
         <Route
@@ -56,8 +57,8 @@ export default function App() {
       </Route>
 
       {/* Por defecto */}
-      <Route path="/" element={<Navigate to="/inicio" replace />} />
-      <Route path="*" element={<Navigate to="/inicio" replace />} />
+      <Route path="/" element={<Navigate to={defaultPath} replace />} />
+      <Route path="*" element={<Navigate to={defaultPath} replace />} />
     </Routes>
   );
 }

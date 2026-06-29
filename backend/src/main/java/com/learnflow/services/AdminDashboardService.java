@@ -8,8 +8,8 @@ import com.learnflow.models.dto.AdminDashboardStatsResponse.SubscriptionDistribu
 import com.learnflow.models.dto.CourseResponse;
 import com.learnflow.models.entity.SubscriptionStatus;
 import com.learnflow.repositories.CourseRepository;
+import com.learnflow.repositories.PlaybackHistoryRepository;
 import com.learnflow.repositories.SubscriptionRepository;
-import com.learnflow.repositories.ViewingLogRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +20,14 @@ import java.util.List;
 public class AdminDashboardService {
 
     private final CourseRepository courseRepository;
-    private final ViewingLogRepository viewingLogRepository;
+    private final PlaybackHistoryRepository playbackHistoryRepository;
     private final SubscriptionRepository subscriptionRepository;
 
     public AdminDashboardService(CourseRepository courseRepository,
-                                 ViewingLogRepository viewingLogRepository,
+                                 PlaybackHistoryRepository playbackHistoryRepository,
                                  SubscriptionRepository subscriptionRepository) {
         this.courseRepository = courseRepository;
-        this.viewingLogRepository = viewingLogRepository;
+        this.playbackHistoryRepository = playbackHistoryRepository;
         this.subscriptionRepository = subscriptionRepository;
     }
 
@@ -47,19 +47,19 @@ public class AdminDashboardService {
 
     @Transactional(readOnly = true)
     public AdminDashboardStatsResponse getStats() {
-        List<CategoryStatsItem> topCategories = viewingLogRepository
+        List<CategoryStatsItem> topCategories = playbackHistoryRepository
                 .findTopCategories(PageRequest.of(0, 3))
                 .stream()
                 .map(row -> new CategoryStatsItem((String) row[0], (Long) row[1]))
                 .toList();
 
-        List<DifficultyLevelStatsItem> topDifficultyLevels = viewingLogRepository
+        List<DifficultyLevelStatsItem> topDifficultyLevels = playbackHistoryRepository
                 .findTopDifficultyLevels(PageRequest.of(0, 3))
                 .stream()
                 .map(row -> new DifficultyLevelStatsItem((String) row[0], (Long) row[1]))
                 .toList();
 
-        List<CourseStatsItem> topCourses = viewingLogRepository
+        List<CourseStatsItem> topCourses = playbackHistoryRepository
                 .findTopCourses(PageRequest.of(0, 10))
                 .stream()
                 .map(row -> new CourseStatsItem((Long) row[0], (String) row[1], (Long) row[2]))

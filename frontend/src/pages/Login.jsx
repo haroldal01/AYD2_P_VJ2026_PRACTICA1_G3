@@ -18,8 +18,8 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await login(form.email, form.password);
-      navigate('/inicio');
+      const session = await login(form.email, form.password);
+      navigate(session.role === 'ADMIN_CONTENIDO' ? '/admin/dashboard' : '/inicio');
     } catch (err) {
       setError(extractError(err));
     } finally {

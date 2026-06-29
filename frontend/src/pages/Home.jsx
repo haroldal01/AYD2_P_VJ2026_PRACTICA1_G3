@@ -9,6 +9,7 @@ export default function Home() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [playError, setPlayError] = useState(null);
+  const [currentPlayback, setCurrentPlayback] = useState(null);
 
   const fetchData = () => {
     setLoading(true);
@@ -33,11 +34,40 @@ export default function Home() {
   const handlePlay = async (courseId) => {
     setPlayError(null);
     try {
-      await api.post(`/playback/play/${courseId}`);
+      const { data } = await api.post(`/playback/play/${courseId}`);
+      setCurrentPlayback(data);
       fetchData();
     } catch (err) {
       setPlayError(extractError(err));
     }
+  };
+
+  const renderPlayer = () => {
+    if (!currentPlayback?.mediaUrl) {
+      return (
+        <div className="player__empty">
+          <p className="muted">Este curso no tiene una URL multimedia configurada.</p>
+        </div>
+      );
+    }
+
+    const youtubeMatch = currentPlayback.mediaUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/);
+    if (youtubeMatch) {
+      return (
+        <iframe
+          title={currentPlayback.courseTitle}
+          src={`https://www.youtube.com/embed/${youtubeMatch[1]}`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      );
+    }
+
+    return (
+      <video controls src={currentPlayback.mediaUrl}>
+        Tu navegador no puede reproducir este contenido.
+      </video>
+    );
   };
 
   if (loading) return <p className="muted">Cargando contenido...</p>;
@@ -55,6 +85,23 @@ export default function Home() {
 
       {playError && (
         <div className="alert alert--error">{playError}</div>
+      )}
+
+      {currentPlayback && (
+        <section className="player card">
+          <div className="card__head">
+            <div>
+              <h2>{currentPlayback.courseTitle}</h2>
+              <p className="muted">{currentPlayback.message}</p>
+            </div>
+            <button className="btn btn--ghost" onClick={() => setCurrentPlayback(null)}>
+              Cerrar
+            </button>
+          </div>
+          <div className="player__frame">
+            {renderPlayer()}
+          </div>
+        </section>
       )}
 
       <section>
@@ -101,6 +148,9 @@ export default function Home() {
                   <span className="muted">{course.instructor} - {course.category}</span>
                 </div>
                 <span className="ranking__views">{course.viewCount.toLocaleString()} vistas</span>
+                <button className="btn btn--small btn--secondary" onClick={() => handlePlay(course.courseId)}>
+                  Reproducir
+                </button>
               </li>
             ))}
           </ol>

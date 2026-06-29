@@ -18,7 +18,13 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = useCallback(async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password });
+    let response;
+    try {
+      response = await api.post('/auth/login', { email, password });
+    } catch (studentError) {
+      response = await api.post('/auth/admin/login', { email, password });
+    }
+    const { data } = response;
     persistSession(data);
     return data;
   }, [persistSession]);
