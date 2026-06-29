@@ -208,7 +208,63 @@ Esta solución facilita la incorporación de nuevos tipos de membresía en el fu
 El patrón Factory Method se implementa en el módulo de suscripciones. Una fábrica se encarga de crear la instancia correspondiente según el plan seleccionado por el estudiante (Mensual, Trimestral o Anual). Cada tipo de membresía implementa su comportamiento específico, mientras que la lógica principal permanece desacoplada del proceso de creación, facilitando futuras ampliaciones de la plataforma.
 
 
-# 5. Conclusiones
+
+# 5. Dailys   
+
+## Luis Pablo Manuel García López
+
+Durante el primer día dejé listo el repositorio privado en GitHub y
+configuré las ramas main y develop. Después preparé el proyecto con
+Spring Boot, organicé la estructura base del backend, configuré la
+conexión con la base de datos y creé las entidades iniciales Student,
+User y Role.
+
+## Harold Alejandro Sánchez Hernández
+
+Comencé trabajando en el módulo de autenticación de estudiantes. Avancé
+con el registro de usuarios, preparé la validación para que no se
+repitan correos electrónicos y dejé iniciada la lógica del inicio de
+sesión junto con los campos principales del perfil.
+
+## Madeline Fabiola Prado Reyes
+
+Mi trabajo del primer día estuvo enfocado en planificar el sistema de
+suscripciones. Inicié la implementación de los planes disponibles y
+estructuré la aplicación del patrón Factory Method para la creación de
+las membresías.
+
+## Jeysson Ezequiel Godoy Torres
+
+Inicié desarrollando la base para la gestión del contenido educativo.
+Dejé preparada la estructura de los CRUD para tipos de contenido,
+categorías y niveles de dificultad, además de definir la información
+principal que tendrá cada curso.
+
+## Kenneth Isaí Aquino Ortiz
+
+La jornada comenzó con la implementación del módulo de reproducción de
+contenido. También preparé la validación de acceso para estudiantes con
+suscripción activa y definí la estructura que almacenará el historial y
+las futuras recomendaciones.
+
+## Diego Andrés Aguilar Díaz
+
+Aproveché el primer día para avanzar con las pantallas principales del
+frontend. Quedaron iniciadas las vistas de inicio de sesión y registro,
+además de la estructura del perfil, suscripciones y la conexión inicial
+con el backend.
+
+## Kevin Golwer Enrique Ruiz Barbales
+
+El enfoque del primer día fue organizar el dashboard administrativo.
+Definí las métricas que deberá mostrar, revisé la documentación del
+proyecto y empecé a verificar que la estructura del repositorio
+cumpliera con los requisitos de la entrega.
+
+
+
+
+# 6. Conclusiones
 
 ## Conclusión 1
 
